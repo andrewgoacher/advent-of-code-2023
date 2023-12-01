@@ -24,4 +24,16 @@ mod tests {
         let result = solve_day_1_part_1(input);
         assert_eq!(expected_result, result)
     }
+
+    #[test]
+    fn solve_day_1_part_1_with_challenge_input() {
+        let lines: Vec<String> = include_str!("../inputs/day_1_part_1.txt")
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
+
+        let expected_result = 56397;
+        let result = solve_day_1_part_1(lines);
+        assert_eq!(expected_result, result)
+    }
 }
