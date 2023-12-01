@@ -4,19 +4,22 @@ pub fn get_number_from_string(input: &str) -> i32 {
     let mut iter = chars.into_iter();
     let first = iter.next();
     let last = iter.next_back();
-    if let Some(f) = first {
-        if let Some(l) = last {
-            let collection = vec![f, l];
-            let number_as_string: String = collection.iter().collect();
-            number_as_string.parse::<i32>().unwrap()
-        } else {
-            let collection = vec![f, f];
-            let number_as_string: String = collection.iter().collect();
-            number_as_string.parse::<i32>().unwrap()
-        }
-    } else {
-        0
+    get_first_and_last(first, last).unwrap_or(0)
+}
+
+fn get_first_and_last(first: Option<char>, last: Option<char>) -> Option<i32> {
+    match first {
+        Some(f) => match last {
+            Some(l) => combine_chars(f, l),
+            None => combine_chars(f, f),
+        },
+        None => None,
     }
+}
+
+fn combine_chars(first: char, last: char) -> Option<i32> {
+    let collection = vec![first, last];
+    collection.iter().collect::<String>().parse::<i32>().ok()
 }
 
 #[cfg(test)]
