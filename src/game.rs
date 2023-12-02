@@ -20,22 +20,22 @@ fn get_game_and_input(input: &str) -> (i32, &str) {
 }
 
 fn get_individual_runs(input: &str) -> Vec<String> {
-    let mut parts = input.split(";");
+    let parts = input.split(";");
     parts
         .into_iter()
         .map(|str| str.trim().to_string())
         .collect()
 }
 
-// pub fn map_input_to_cubes_puled(input: &str) -> Vec<CubesPulled> {
-//    let (id, rest) = get_game_and_input(input);
-//     let mut parts = rest.split(";");
-//
-//     parts
-//         .map(|part| CubesPulled::from_string(id, part))
-//         .collect()
-// }
-//
+pub fn map_input_to_cubes_puled(input: &str) -> Vec<CubesPulled> {
+    let (id, rest) = get_game_and_input(input);
+    let parts = rest.split(";");
+
+    parts
+        .map(|part| CubesPulled::from_string(id, part))
+        .collect()
+}
+
 impl CubesPulled {
     fn new(id: i32, r: i32, g: i32, b: i32) -> Self {
         Self {
@@ -69,7 +69,7 @@ mod game_tests {
     #[test]
     fn get_game_and_input_gets_correct_id() {
         let input = "Game 1: 3 blue, 4 red";
-        let (id, rest) = get_game_and_input(input);
+        let (id, _) = get_game_and_input(input);
 
         assert_eq!(1, id)
     }
@@ -77,7 +77,7 @@ mod game_tests {
     #[test]
     fn get_game_and_input_gets_correct_remainder() {
         let input = "Game 1: 3 blue, 4 red";
-        let (id, rest) = get_game_and_input(input);
+        let (_, rest) = get_game_and_input(input);
 
         assert_eq!("3 blue, 4 red", rest)
     }
@@ -112,5 +112,17 @@ mod game_tests {
         let collection = CubesPulled::from_string(id, input);
 
         assert_eq!(expected, collection)
+    }
+
+    #[test]
+    fn map_input_to_cubes_puled_input_string_produces_correct_output() {
+        let input = "Game 5: 3 blue, 4 red, 1 green; 1 blue, 2 red";
+        let id = 5;
+        let expected_collection =
+            vec![CubesPulled::new(id, 4, 1, 3), CubesPulled::new(id, 2, 0, 1)];
+
+        let collection = map_input_to_cubes_puled(input);
+
+        assert_eq!(expected_collection, collection)
     }
 }
