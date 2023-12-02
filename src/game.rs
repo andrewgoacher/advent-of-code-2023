@@ -37,6 +37,21 @@ pub fn map_input_to_cubes_puled(input: &str) -> Vec<CubesPulled> {
         .collect()
 }
 
+fn get_highest_value(input: (i32, i32)) -> i32 {
+    match input {
+        (0, 0) => 0,
+        (0, x) => x,
+        (x, 0) => x,
+        (x, y) => {
+            if x < y {
+                y
+            } else {
+                x
+            }
+        }
+    }
+}
+
 impl CubesPulled {
     fn new(id: i32, r: i32, g: i32, b: i32) -> Self {
         Self {
@@ -47,9 +62,8 @@ impl CubesPulled {
         }
     }
 
-    pub fn collect(cubes: Vec<CubesPulled>) -> Self {
+    pub fn collect_max(cubes: Vec<CubesPulled>) -> Self {
         let (r, g, b) = cubes.iter().fold((0, 0, 0), |aggregate, item| {
-            println!("Collecting: {:?}", item);
             return (
                 if aggregate.0 > item.red {
                     aggregate.0
@@ -77,6 +91,27 @@ impl CubesPulled {
         }
     }
 
+    pub fn collect_min(cubes: Vec<CubesPulled>) -> Self {
+        let (r, g, b) = cubes.iter().fold((0, 0, 0), |aggregate, item| {
+            let rr = (aggregate.0, item.red);
+            let gg = (aggregate.1, item.green);
+            let bb = (aggregate.2, item.blue);
+
+            return (
+                get_highest_value(rr),
+                get_highest_value(gg),
+                get_highest_value(bb),
+            );
+        });
+
+        Self {
+            id: cubes[0].id,
+            red: r,
+            green: g,
+            blue: b,
+        }
+    }
+
     pub fn from_string(id: i32, input: &str) -> Self {
         let pattern = r"(\d+) (\w+)";
         let re = Regex::new(pattern).unwrap();
@@ -91,6 +126,10 @@ impl CubesPulled {
             map.get("green").copied().unwrap_or(0),
             map.get("blue").copied().unwrap_or(0),
         )
+    }
+
+    pub fn pow(&self) -> i32 {
+        self.red * self.blue * self.green
     }
 }
 

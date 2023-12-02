@@ -25,9 +25,18 @@ pub fn solve_day_2_part_1(lines: Vec<String>) -> i32 {
     lines
         .iter()
         .map(|line| game::map_input_to_cubes_puled(line))
-        .map(|collection| CubesPulled::collect(collection))
+        .map(|collection| CubesPulled::collect_max(collection))
         .filter(|item| item.red <= MAX_RED && item.green <= MAX_GREEN && item.blue <= MAX_BLUE)
         .map(|item| item.id)
+        .sum()
+}
+
+pub fn solve_day_2_part_2(lines: Vec<String>) -> i32 {
+    lines
+        .iter()
+        .map(|line| game::map_input_to_cubes_puled(line))
+        .map(|collection| CubesPulled::collect_min(collection))
+        .map(|item| item.pow())
         .sum()
 }
 
@@ -86,6 +95,25 @@ mod tests {
     }
 
     #[test]
+    fn solve_day_2_part_2_with_example_input() {
+        let input = vec![
+            String::from("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"),
+            String::from("Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue"),
+            String::from(
+                "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
+            ),
+            String::from(
+                "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red",
+            ),
+            String::from("Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"),
+        ];
+
+        let expected_result = 2286;
+        let result = solve_day_2_part_2(input);
+        assert_eq!(expected_result, result)
+    }
+
+    #[test]
     fn solve_day_1_part_1_with_challenge_input() {
         let lines: Vec<String> = include_str!("../inputs/day_1.txt")
             .split_whitespace()
@@ -118,6 +146,18 @@ mod tests {
 
         let expected_result = 2563;
         let result = solve_day_2_part_1(lines);
+        assert_eq!(expected_result, result)
+    }
+
+    #[test]
+    fn solve_day_2_part_2_with_challenge_input() {
+        let lines: Vec<String> = include_str!("../inputs/day_2.txt")
+            .lines()
+            .map(|s| s.to_string())
+            .collect();
+
+        let expected_result = 70768;
+        let result = solve_day_2_part_2(lines);
         assert_eq!(expected_result, result)
     }
 }
