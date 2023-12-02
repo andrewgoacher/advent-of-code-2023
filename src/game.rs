@@ -29,9 +29,10 @@ fn get_individual_runs(input: &str) -> Vec<String> {
 
 pub fn map_input_to_cubes_puled(input: &str) -> Vec<CubesPulled> {
     let (id, rest) = get_game_and_input(input);
-    let parts = rest.split(";");
+    let parts = get_individual_runs(rest);
 
     parts
+        .iter()
         .map(|part| CubesPulled::from_string(id, part))
         .collect()
 }
@@ -48,10 +49,23 @@ impl CubesPulled {
 
     pub fn collect(cubes: Vec<CubesPulled>) -> Self {
         let (r, g, b) = cubes.iter().fold((0, 0, 0), |aggregate, item| {
+            println!("Collecting: {:?}", item);
             return (
-                aggregate.0 + item.red,
-                aggregate.1 + item.green,
-                aggregate.2 + item.blue,
+                if aggregate.0 > item.red {
+                    aggregate.0
+                } else {
+                    item.red
+                },
+                if aggregate.1 > item.green {
+                    aggregate.1
+                } else {
+                    item.green
+                },
+                if aggregate.2 > item.blue {
+                    aggregate.2
+                } else {
+                    item.blue
+                },
             );
         });
 
@@ -83,6 +97,26 @@ impl CubesPulled {
 #[cfg(test)]
 mod game_tests {
     use super::*;
+
+    macro_rules! get_game_and_input_has_correct_id {
+    ($($name:ident: $value:expr,)*) => {
+    $(
+        #[test]
+        fn $name() {
+            let number = $value;
+            let input = format!("Game {}: 3 blue, 4 red", number);
+            let (id, _) = get_game_and_input(&input);
+            assert_eq!(number, id)
+        }
+    )*
+    }
+    }
+
+    get_game_and_input_has_correct_id! {
+        test_1: (1),
+        test_2: (9),
+        test_3: (50),
+    }
 
     #[test]
     fn get_game_and_input_gets_correct_id() {
@@ -134,10 +168,12 @@ mod game_tests {
 
     #[test]
     fn map_input_to_cubes_puled_input_string_produces_correct_output() {
-        let input = "Game 5: 3 blue, 4 red, 1 green; 1 blue, 2 red";
+        let input = "Game 5: 13 blue, 4 red, 1 green; 1 blue, 20 red";
         let id = 5;
-        let expected_collection =
-            vec![CubesPulled::new(id, 4, 1, 3), CubesPulled::new(id, 2, 0, 1)];
+        let expected_collection = vec![
+            CubesPulled::new(id, 4, 1, 13),
+            CubesPulled::new(id, 20, 0, 1),
+        ];
 
         let collection = map_input_to_cubes_puled(input);
 

@@ -18,9 +18,9 @@ pub fn solve_day_1_part_2(lines: Vec<String>) -> i32 {
 }
 
 pub fn solve_day_2_part_1(lines: Vec<String>) -> i32 {
-    const MAX_BLUE: i32 = 14;
-    const MAX_GREEN: i32 = 13;
     const MAX_RED: i32 = 12;
+    const MAX_GREEN: i32 = 13;
+    const MAX_BLUE: i32 = 14;
 
     lines
         .iter()
@@ -106,6 +106,18 @@ mod tests {
 
         let expected_result = 55701;
         let result = solve_day_1_part_2(lines);
+        assert_eq!(expected_result, result)
+    }
+
+    #[test]
+    fn solve_day_2_part_1_with_challenge_input() {
+        let lines: Vec<String> = include_str!("../inputs/day_2.txt")
+            .lines()
+            .map(|s| s.to_string())
+            .collect();
+
+        let expected_result = 2563;
+        let result = solve_day_2_part_1(lines);
         assert_eq!(expected_result, result)
     }
 }
