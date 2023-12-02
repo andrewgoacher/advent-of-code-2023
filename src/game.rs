@@ -1,3 +1,8 @@
+use std::collections::HashMap;
+
+use regex::Regex;
+
+#[derive(PartialEq, Debug)]
 pub struct CubesPulled {
     id: i32,
     blue: i32,
@@ -31,22 +36,31 @@ fn get_individual_runs(input: &str) -> Vec<String> {
 //         .collect()
 // }
 //
-// impl CubesPulled {
-//     pub fn from_string(id: i32, input: &str) -> Self {
-//         let pattern = r"(\d+) (\w+)";
-//         let re = Regex::new(pattern).unwrap();
-//         let map: HashMap<String, i32> = re.captures_iter(input)
-//             .map(|m| (m[2].to_string().clone(), m[1].parse::<i32>()))
-//             .collect();
-//
-//         Self {
-//             id,
-//             blue: map.get("blue").unwrap_or(*0),
-//             green: map.get("green").unwrap_or(*0),
-//             red: map.get("red").unwrap_or(*0)
-//         }
-//     }
-// }
+impl CubesPulled {
+    fn new(id: i32, r: i32, g: i32, b: i32) -> Self {
+        Self {
+            id,
+            red: r,
+            green: g,
+            blue: b,
+        }
+    }
+    pub fn from_string(id: i32, input: &str) -> Self {
+        let pattern = r"(\d+) (\w+)";
+        let re = Regex::new(pattern).unwrap();
+        let map: HashMap<String, i32> = re
+            .captures_iter(input)
+            .map(|m| (m[2].to_string(), m[1].parse::<i32>().unwrap_or(0)))
+            .collect();
+
+        Self::new(
+            id,
+            map.get("red").copied().unwrap_or(0),
+            map.get("green").copied().unwrap_or(0),
+            map.get("blue").copied().unwrap_or(0),
+        )
+    }
+}
 
 #[cfg(test)]
 mod game_tests {
@@ -86,6 +100,17 @@ mod game_tests {
             String::from("3 blue, 4 red"),
             String::from("1 green, 2 red"),
         ];
+        assert_eq!(expected, collection)
+    }
+
+    #[test]
+    fn cubes_pulled_from_string_single_input_returns_correct_cube() {
+        let input = "3 blue, 4 red, 1 green";
+        let id = 5;
+        let expected = CubesPulled::new(id, 4, 1, 3);
+
+        let collection = CubesPulled::from_string(id, input);
+
         assert_eq!(expected, collection)
     }
 }
