@@ -1,3 +1,6 @@
+use crate::game::CubesPulled;
+
+mod game;
 mod string_utils;
 
 pub fn solve_day_1_part_1(lines: Vec<String>) -> i32 {
@@ -15,7 +18,17 @@ pub fn solve_day_1_part_2(lines: Vec<String>) -> i32 {
 }
 
 pub fn solve_day_2_part_1(lines: Vec<String>) -> i32 {
-    0
+    const MAX_BLUE: i32 = 14;
+    const MAX_GREEN: i32 = 13;
+    const MAX_RED: i32 = 12;
+
+    lines
+        .iter()
+        .map(|line| game::map_input_to_cubes_puled(line))
+        .map(|collection| CubesPulled::collect(collection))
+        .filter(|item| item.red <= MAX_RED && item.green <= MAX_GREEN && item.blue <= MAX_BLUE)
+        .map(|item| item.id)
+        .sum()
 }
 
 #[cfg(test)]

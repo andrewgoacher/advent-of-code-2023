@@ -4,10 +4,10 @@ use regex::Regex;
 
 #[derive(PartialEq, Debug)]
 pub struct CubesPulled {
-    id: i32,
-    blue: i32,
-    green: i32,
-    red: i32,
+    pub id: i32,
+    pub blue: i32,
+    pub green: i32,
+    pub red: i32,
 }
 
 fn get_game_and_input(input: &str) -> (i32, &str) {
@@ -45,6 +45,24 @@ impl CubesPulled {
             blue: b,
         }
     }
+
+    pub fn collect(cubes: Vec<CubesPulled>) -> Self {
+        let (r, g, b) = cubes.iter().fold((0, 0, 0), |aggregate, item| {
+            return (
+                aggregate.0 + item.red,
+                aggregate.1 + item.green,
+                aggregate.2 + item.blue,
+            );
+        });
+
+        Self {
+            id: cubes[0].id,
+            red: r,
+            green: g,
+            blue: b,
+        }
+    }
+
     pub fn from_string(id: i32, input: &str) -> Self {
         let pattern = r"(\d+) (\w+)";
         let re = Regex::new(pattern).unwrap();
