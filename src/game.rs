@@ -14,6 +14,14 @@ fn get_game_and_input(input: &str) -> (i32, &str) {
     (id, rest.trim())
 }
 
+fn get_individual_runs(input: &str) -> Vec<String> {
+    let mut parts = input.split(";");
+    parts
+        .into_iter()
+        .map(|str| str.trim().to_string())
+        .collect()
+}
+
 // pub fn map_input_to_cubes_puled(input: &str) -> Vec<CubesPulled> {
 //    let (id, rest) = get_game_and_input(input);
 //     let mut parts = rest.split(";");
@@ -58,5 +66,26 @@ mod game_tests {
         let (id, rest) = get_game_and_input(input);
 
         assert_eq!("3 blue, 4 red", rest)
+    }
+
+    #[test]
+    fn get_individual_runs_single_input_returns_correct_input() {
+        let input = "3 blue, 4 red";
+        let collection = get_individual_runs(input);
+
+        let expected = vec![String::from("3 blue, 4 red")];
+        assert_eq!(expected, collection)
+    }
+
+    #[test]
+    fn get_individual_runs_multiple_input_returns_correct_input() {
+        let input = "3 blue, 4 red ; 1 green, 2 red";
+        let collection = get_individual_runs(input);
+
+        let expected = vec![
+            String::from("3 blue, 4 red"),
+            String::from("1 green, 2 red"),
+        ];
+        assert_eq!(expected, collection)
     }
 }
