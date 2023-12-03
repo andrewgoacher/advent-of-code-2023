@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::engine::Component::Gear;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -9,7 +11,25 @@ pub enum Component {
 #[derive(Debug, PartialEq)]
 pub struct Part {
     pub number: u32,
-    component: Component,
+    pub component: Component,
+}
+
+pub fn get_component_index(component: Component) -> usize {
+    match component {
+        Gear(s) => s.clone(),
+        Component::Component(_, s) => s.clone(),
+    }
+}
+
+pub fn collect(parts: Vec<Part>) -> HashMap<usize, Vec<Part>> {
+    let mut hashmap = HashMap::new();
+
+    for part in parts {
+        let key = get_component_index(part.component);
+        hashmap.entry(key).or_insert(Vec::new()).push(part);
+    }
+
+    hashmap
 }
 
 pub fn process_input(input: Vec<String>) -> Vec<Part> {
