@@ -171,4 +171,32 @@ mod engine_tests {
 
         assert_eq!(expected, actual)
     }
+
+    #[test]
+    fn collect_parts_multiple_lines_multiple_single_line_parts_returns_items() {
+        let input = vec![
+            String::from("#334...."),
+            String::from("..123*.."),
+            String::from("....456#"),
+        ];
+
+        let actual = process_input(input);
+
+        let expected = vec![
+            Part {
+                number: 334,
+                component: '#',
+            },
+            Part {
+                number: 123,
+                component: '*',
+            },
+            Part {
+                number: 456,
+                component: '#',
+            },
+        ];
+
+        assert_eq!(expected, actual)
+    }
 }
