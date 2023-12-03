@@ -124,4 +124,23 @@ mod engine_tests {
 
         assert_eq!(expected, actual)
     }
+
+    #[test]
+    fn collect_parts_single_line_multiple_parts_returns_items() {
+        let input = "*123..234#";
+        let actual = process_input(vec![String::from(input)]);
+
+        let expected = vec![
+            Part {
+                number: 123,
+                component: '*',
+            },
+            Part {
+                number: 234,
+                component: '#',
+            },
+        ];
+
+        assert_eq!(expected, actual)
+    }
 }
