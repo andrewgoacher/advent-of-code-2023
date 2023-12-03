@@ -1,5 +1,6 @@
 use crate::game::CubesPulled;
 
+mod engine;
 mod game;
 mod string_utils;
 
