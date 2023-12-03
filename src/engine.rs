@@ -14,6 +14,15 @@ fn process_input(input: Vec<String>) -> Vec<Part> {
     for i in 0..input_length {
         let line = input.get(i).expect("Should have value");
         let chars: Vec<char> = line.chars().collect();
+
+        let chars_above = if i == 0 {
+            vec![]
+        } else {
+            input.get(i - 1).map_or(vec![], |s| s.chars().collect())
+        };
+
+        let chars_below = input.get(i + 1).map_or(vec![], |s| s.chars().collect());
+
         for j in 0..line.len() {
             let current_char = chars.get(j).expect("should have char");
             match current_char {
@@ -25,7 +34,27 @@ fn process_input(input: Vec<String>) -> Vec<Part> {
                         });
                     }
                     val = 0;
-                    part_char = '.';
+
+                    let mut possibilities = vec![
+                        chars_above.get(j),
+                        chars_above.get(j + 1),
+                        chars_below.get(j),
+                        chars_below.get(j + 1),
+                    ];
+
+                    if j > 0 {
+                        possibilities.push(chars_above.get(j - 1));
+                        possibilities.push(chars_below.get(j - 1));
+                    }
+
+                    let possibilities: Vec<&char> = possibilities
+                        .into_iter()
+                        .filter_map(|p| p.map(|p| p))
+                        .collect();
+
+                    if possibilities.len() == 0 {
+                        part_char = '.';
+                    }
                 }
                 x if is_symbol(x) => {
                     if val > 0 {
