@@ -143,4 +143,14 @@ mod engine_tests {
 
         assert_eq!(expected, actual)
     }
+
+    #[test]
+    fn collect_parts_single_line_with_symbol_no_nuber_returns_no_items() {
+        let input = "...*....";
+        let actual = process_input(vec![String::from(input)]);
+
+        let expected: Vec<Part> = vec![];
+
+        assert_eq!(expected, actual)
+    }
 }
