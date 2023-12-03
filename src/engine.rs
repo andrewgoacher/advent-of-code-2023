@@ -1,9 +1,9 @@
 use crate::engine::Component::Gear;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Component {
-    Gear,
-    Component(char),
+    Gear(usize),
+    Component(char, usize),
 }
 
 #[derive(Debug, PartialEq)]
@@ -45,13 +45,15 @@ pub fn process_input(input: Vec<String>) -> Vec<Part> {
                         chars_above.clone(),
                         chars_below.clone(),
                         chars.clone(),
+                        i,
+                        line.len(),
                         start_index,
                         end_index,
                     );
                     for component in components {
                         parts.push(Part {
                             number: num,
-                            component: get_component(component),
+                            component,
                         })
                     }
                     num = 0;
@@ -65,13 +67,15 @@ pub fn process_input(input: Vec<String>) -> Vec<Part> {
                 chars_above.clone(),
                 chars_below.clone(),
                 chars.clone(),
+                i,
+                line.len(),
                 start_index,
                 end_index,
             );
             for component in components {
                 parts.push(Part {
                     number: num,
-                    component: get_component(component),
+                    component,
                 })
             }
         }
@@ -85,31 +89,67 @@ fn check_surroundings(
     above: Vec<char>,
     below: Vec<char>,
     current: Vec<char>,
+    row_index: usize,
+    len: usize,
     start_index: usize,
     end_index: usize,
-) -> Vec<char> {
+) -> Vec<Component> {
     let start_range = if start_index == 0 { 0 } else { start_index - 1 };
 
     let end_range = end_index + 1;
 
-    let mut possibilities = vec![current.get(start_range), current.get(end_range)];
+    let mut possibilities: Vec<Component> = vec![];
+
+    if let Some(start) = try_create_component(current.get(start_range), row_index, start_range, len)
+    {
+        possibilities.push(start);
+    }
+
+    if let Some(end) = try_create_component(current.get(end_range), row_index, end_range, len) {
+        possibilities.push(end);
+    }
 
     for i in start_range..(end_range + 1) {
-        possibilities.push(above.get(i));
-        possibilities.push(below.get(i));
+        if row_index > 0 {
+            if let Some(above) = try_create_component(above.get(i), row_index - 1, i, len) {
+                possibilities.push(above);
+            }
+        }
+
+        if let Some(below) = try_create_component(below.get(i), row_index + 1, i, len) {
+            possibilities.push(below);
+        }
     }
 
     possibilities
-        .iter()
-        .filter_map(|c| c.map(|c| c.clone()))
-        .filter(|c| is_symbol(c))
-        .collect()
 }
 
-fn get_component(input: char) -> Component {
+fn try_create_component(
+    c: Option<&char>,
+    row_index: usize,
+    jpos: usize,
+    len: usize,
+) -> Option<Component> {
+    match c {
+        None => None,
+        Some(c) => {
+            let component_index = calculate_component_index(row_index, len, jpos);
+            match is_symbol(c) {
+                false => None,
+                true => Some(get_component(c.clone(), component_index)),
+            }
+        }
+    }
+}
+
+fn calculate_component_index(row_index: usize, len: usize, jpos: usize) -> usize {
+    (row_index * len) + jpos
+}
+
+fn get_component(input: char, component_index: usize) -> Component {
     match input {
-        '*' => Gear,
-        _ => Component::Component(input),
+        '*' => Gear(component_index),
+        _ => Component::Component(input.clone(), component_index),
     }
 }
 
@@ -171,7 +211,7 @@ mod engine_tests {
         let actual = process_input(vec![String::from(input)]);
         let expected = vec![Part {
             number: 123,
-            component: Gear,
+            component: Gear(3),
         }];
 
         assert_eq!(expected, actual)
@@ -183,7 +223,7 @@ mod engine_tests {
         let actual = process_input(vec![String::from(input)]);
         let expected = vec![Part {
             number: 123,
-            component: Gear,
+            component: Gear(0),
         }];
 
         assert_eq!(expected, actual)
@@ -197,11 +237,11 @@ mod engine_tests {
         let expected = vec![
             Part {
                 number: 123,
-                component: Gear,
+                component: Gear(0),
             },
             Part {
                 number: 234,
-                component: Component::Component('#'),
+                component: Component::Component('#', 9),
             },
         ];
 
@@ -230,7 +270,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: Gear,
+            component: Gear(13),
         }];
 
         assert_eq!(expected, actual)
@@ -248,7 +288,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: Component::Component('#'),
+            component: Component::Component('#', 15),
         }];
 
         assert_eq!(expected, actual)
@@ -266,7 +306,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: Component::Component('#'),
+            component: Component::Component('#', 23),
         }];
 
         assert_eq!(expected, actual)
@@ -284,7 +324,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: Component::Component('#'),
+            component: Component::Component('#', 7),
         }];
 
         assert_eq!(expected, actual)
@@ -304,23 +344,23 @@ mod engine_tests {
         let expected = vec![
             Part {
                 number: 334,
-                component: Component::Component('#'),
+                component: Component::Component('#', 0),
             },
             Part {
                 number: 123,
-                component: Gear,
+                component: Gear(15),
             },
             Part {
                 number: 123,
-                component: Component::Component('#'),
+                component: Component::Component('#', 23),
             },
             Part {
                 number: 456,
-                component: Component::Component('#'),
+                component: Component::Component('#', 23),
             },
             Part {
                 number: 456,
-                component: Gear,
+                component: Gear(15),
             },
         ];
 
@@ -354,7 +394,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: Gear,
+            component: Gear(2),
         }];
 
         assert_eq!(expected, actual)
@@ -373,15 +413,15 @@ mod engine_tests {
         let expected = vec![
             Part {
                 number: 24,
-                component: Component::Component('$'),
+                component: Component::Component('$', 11),
             },
             Part {
                 number: 4,
-                component: Component::Component('-'),
+                component: Component::Component('-', 12),
             },
             Part {
                 number: 4,
-                component: Gear,
+                component: Gear(22),
             },
         ];
 
