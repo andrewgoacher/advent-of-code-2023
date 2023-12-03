@@ -1,18 +1,14 @@
 #[derive(Debug, PartialEq)]
-struct Part {
-    number: u32,
-    component: char,
+pub struct Part {
+    pub number: u32,
+    component: Option<char>,
 }
 
-fn process_input(input: Vec<String>) -> Vec<Part> {
+pub fn process_input(input: Vec<String>) -> Vec<Part> {
     let mut parts = vec![];
-    let mut val = 0;
-    let mut part_char = '.';
 
-    let input_length = input.len();
-
-    for i in 0..input_length {
-        let line = input.get(i).expect("Should have value");
+    for i in 0..input.len() {
+        let line = input.get(i).expect("Invalid: Should have line here");
         let chars: Vec<char> = line.chars().collect();
 
         let chars_above = if i == 0 {
@@ -23,61 +19,79 @@ fn process_input(input: Vec<String>) -> Vec<Part> {
 
         let chars_below = input.get(i + 1).map_or(vec![], |s| s.chars().collect());
 
+        let mut num = 0u32;
+        let mut start_index = 0;
+
         for j in 0..line.len() {
-            let current_char = chars.get(j).expect("should have char");
-            match current_char {
-                '.' => {
-                    if val > 0 && part_char != '.' {
-                        parts.push(Part {
-                            number: val,
-                            component: part_char,
-                        });
-                    }
-                    val = 0;
-
-                    let mut possibilities = vec![
-                        chars_above.get(j),
-                        chars_above.get(j + 1),
-                        chars_below.get(j),
-                        chars_below.get(j + 1),
-                    ];
-
-                    if j > 0 {
-                        possibilities.push(chars_above.get(j - 1));
-                        possibilities.push(chars_below.get(j - 1));
-                    }
-
-                    let possibilities: Vec<&char> = possibilities
-                        .into_iter()
-                        .filter_map(|p| p.map(|p| p))
-                        .collect();
-
-                    if possibilities.len() == 0 {
-                        part_char = '.';
-                    }
+            let current_char = chars.get(j).expect("Should always get a character here");
+            if current_char.is_numeric() {
+                let digit: u32 = current_char.to_digit(10).expect("Should be numerical");
+                if num == 0 {
+                    start_index = j;
                 }
-                x if is_symbol(x) => {
-                    if val > 0 {
-                        parts.push(Part {
-                            number: val,
-                            component: current_char.clone(),
-                        });
-                        val = 0;
-                        part_char = '.';
-                    } else {
-                        part_char = current_char.clone();
-                    }
+                num = (num * 10) + digit;
+            } else if is_symbol(current_char) {
+                if num > 0 {
+                    parts.push(Part {
+                        number: num,
+                        component: Some(current_char.clone()),
+                    });
+                    num = 0;
+                    start_index = 0;
                 }
-                x if x.is_numeric() => {
-                    let num = x.to_digit(10).expect("Should be numberic");
-                    val = (val * 10) + num;
+            } else {
+                if num > 0 && j > 0 {
+                    let component = check_surroundings(
+                        chars_above.clone(),
+                        chars_below.clone(),
+                        chars.clone(),
+                        start_index,
+                        j - 1,
+                    );
+                    parts.push(Part {
+                        number: num,
+                        component,
+                    });
+                    num = 0;
                 }
-                _ => {}
-            };
+            }
         }
     }
 
     parts
+        .into_iter()
+        .filter(|part| part.component.is_some())
+        .collect()
+}
+
+fn check_surroundings(
+    above: Vec<char>,
+    below: Vec<char>,
+    current: Vec<char>,
+    start_index: usize,
+    end_index: usize,
+) -> Option<char> {
+    let start_range = if start_index == 0 { 0 } else { start_index - 1 };
+
+    let end_range = end_index + 1;
+
+    let mut possibilities = vec![current.get(start_range), current.get(end_range)];
+
+    for i in start_range..(end_range + 1) {
+        possibilities.push(above.get(i));
+        possibilities.push(below.get(i));
+    }
+
+    let possibilities: Vec<char> = possibilities
+        .iter()
+        .filter_map(|c| c.map(|c| c.clone()))
+        .filter(|c| is_symbol(c))
+        .collect();
+
+    match possibilities.get(0) {
+        Some(c) => Some(c.clone()),
+        None => None,
+    }
 }
 
 fn is_symbol(input: &char) -> bool {
@@ -136,7 +150,7 @@ mod engine_tests {
         let actual = process_input(vec![String::from(input)]);
         let expected = vec![Part {
             number: 123,
-            component: '*',
+            component: Some('*'),
         }];
 
         assert_eq!(expected, actual)
@@ -148,7 +162,7 @@ mod engine_tests {
         let actual = process_input(vec![String::from(input)]);
         let expected = vec![Part {
             number: 123,
-            component: '*',
+            component: Some('*'),
         }];
 
         assert_eq!(expected, actual)
@@ -162,11 +176,11 @@ mod engine_tests {
         let expected = vec![
             Part {
                 number: 123,
-                component: '*',
+                component: Some('*'),
             },
             Part {
                 number: 234,
-                component: '#',
+                component: Some('#'),
             },
         ];
 
@@ -195,7 +209,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: '*',
+            component: Some('*'),
         }];
 
         assert_eq!(expected, actual)
@@ -214,15 +228,15 @@ mod engine_tests {
         let expected = vec![
             Part {
                 number: 334,
-                component: '#',
+                component: Some('#'),
             },
             Part {
                 number: 123,
-                component: '*',
+                component: Some('*'),
             },
             Part {
                 number: 456,
-                component: '#',
+                component: Some('#'),
             },
         ];
 
@@ -256,7 +270,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: '*',
+            component: Some('*'),
         }];
 
         assert_eq!(expected, actual)

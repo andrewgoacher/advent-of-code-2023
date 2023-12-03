@@ -41,8 +41,8 @@ pub fn solve_day_2_part_2(lines: Vec<String>) -> i32 {
         .sum()
 }
 
-pub fn solve_day_3_part_1(lines: Vec<String>) -> i32 {
-    0
+pub fn solve_day_3_part_1(lines: Vec<String>) -> u32 {
+    engine::process_input(lines).iter().map(|p| p.number).sum()
 }
 
 #[cfg(test)]
