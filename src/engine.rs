@@ -23,9 +23,9 @@ fn process_input(input: Vec<String>) -> Vec<Part> {
                             number: val,
                             component: part_char,
                         });
-                        val = 0;
-                        part_char = '.';
                     }
+                    val = 0;
+                    part_char = '.';
                 }
                 x if is_symbol(x) => {
                     if val > 0 {
@@ -196,6 +196,39 @@ mod engine_tests {
                 component: '#',
             },
         ];
+
+        assert_eq!(expected, actual)
+    }
+
+    #[test]
+    fn collect_parts_multiple_lines_with_symbol_and_number_not_touching_returns_empty() {
+        let input = vec![
+            String::from(".......*"),
+            String::from("..123..."),
+            String::from("........"),
+        ];
+
+        let actual = process_input(input);
+
+        let expected: Vec<Part> = vec![];
+
+        assert_eq!(expected, actual)
+    }
+
+    #[test]
+    fn collect_parts_multiple_lines_single_item_touching_above_returns_item() {
+        let input = vec![
+            String::from("..*....."),
+            String::from("..123..."),
+            String::from("........"),
+        ];
+
+        let actual = process_input(input);
+
+        let expected = vec![Part {
+            number: 123,
+            component: '*',
+        }];
 
         assert_eq!(expected, actual)
     }
