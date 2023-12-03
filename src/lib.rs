@@ -185,4 +185,16 @@ mod tests {
         let result = solve_day_2_part_2(lines);
         assert_eq!(expected_result, result)
     }
+
+    #[test]
+    fn solve_day_3_part_1_with_challenge_input() {
+        let lines: Vec<String> = include_str!("../inputs/day_3.txt")
+            .lines()
+            .map(|s| s.to_string())
+            .collect();
+
+        let expected_result = 0;
+        let result = solve_day_3_part_1(lines);
+        assert_eq!(expected_result, result)
+    }
 }

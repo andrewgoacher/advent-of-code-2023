@@ -97,7 +97,9 @@ fn check_surroundings(
 fn is_symbol(input: &char) -> bool {
     match input {
         '.' => false,
-        x if x.is_alphanumeric() => false,
+        '\r' => false,
+        '\n' => false,
+        x if x.is_numeric() => false,
         _ => true,
     }
 }
@@ -121,7 +123,7 @@ mod engine_tests {
 
     is_symbol_tests! {
         is_period_symbol: ('.', false),
-        is_letter_symbol: ('a', false),
+        is_letter_symbol: ('a', true),
         is_hash_symbol: ('#', true),
         is_asterisk_symbol: ('*', true),
     }
@@ -218,9 +220,10 @@ mod engine_tests {
     #[test]
     fn collect_parts_multiple_lines_multiple_single_line_parts_returns_items() {
         let input = vec![
-            String::from("#334...."),
-            String::from("..123*.."),
-            String::from("....456#"),
+            String::from("#334....\r\n"),
+            String::from("..123*..\r\n"),
+            String::from("...#456.\r\n"),
+            String::from("......78\r\n"),
         ];
 
         let actual = process_input(input);
@@ -272,6 +275,30 @@ mod engine_tests {
             number: 123,
             component: Some('*'),
         }];
+
+        assert_eq!(expected, actual)
+    }
+
+    #[test]
+    fn collect_parts_multiple_lines_additional_test_1() {
+        let input = vec![
+            String::from("........"),
+            String::from(".24$-4.."),
+            String::from("......*."),
+        ];
+
+        let actual = process_input(input);
+
+        let expected = vec![
+            Part {
+                number: 24,
+                component: Some('$'),
+            },
+            Part {
+                number: 4,
+                component: Some('-'),
+            },
+        ];
 
         assert_eq!(expected, actual)
     }
