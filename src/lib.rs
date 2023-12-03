@@ -40,6 +40,10 @@ pub fn solve_day_2_part_2(lines: Vec<String>) -> i32 {
         .sum()
 }
 
+pub fn solve_day_3_part_1(lines: Vec<String>) -> i32 {
+    0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -110,6 +114,26 @@ mod tests {
 
         let expected_result = 2286;
         let result = solve_day_2_part_2(input);
+        assert_eq!(expected_result, result)
+    }
+
+    #[test]
+    fn solve_day_3_part_1_with_example_input() {
+        let input = vec![
+            String::from("467..114.."),
+            String::from("...*......"),
+            String::from("..35..633."),
+            String::from("......#..."),
+            String::from("617*......"),
+            String::from(".....+.58."),
+            String::from("..592....."),
+            String::from("......755."),
+            String::from("...$.*...."),
+            String::from(".664.598.."),
+        ];
+
+        let expected_result = 4361;
+        let result = solve_day_3_part_1(input);
         assert_eq!(expected_result, result)
     }
 
