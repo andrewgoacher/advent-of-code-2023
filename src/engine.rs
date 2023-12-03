@@ -1,7 +1,15 @@
+use crate::engine::Component::Gear;
+
+#[derive(Debug, PartialEq)]
+pub enum Component {
+    Gear,
+    Component(char),
+}
+
 #[derive(Debug, PartialEq)]
 pub struct Part {
     pub number: u32,
-    component: char,
+    component: Component,
 }
 
 pub fn process_input(input: Vec<String>) -> Vec<Part> {
@@ -30,28 +38,7 @@ pub fn process_input(input: Vec<String>) -> Vec<Part> {
                     start_index = j;
                 }
                 num = (num * 10) + digit;
-            }
-            // else if is_symbol(current_char) {
-            //     if num > 0 {
-            //         let end_index = if j == 0 { 0 } else { j - 1 };
-            //         let components = check_surroundings(
-            //             chars_above.clone(),
-            //             chars_below.clone(),
-            //             chars.clone(),
-            //             start_index,
-            //             end_index
-            //             ,
-            //         );
-            //         for component in components {
-            //             parts.push(Part {
-            //                 number: num,
-            //                 component,
-            //             })
-            //         }
-            //         num = 0;
-            //     }
-            // }
-            else {
+            } else {
                 if num > 0 {
                     let end_index = if j == 0 { 0 } else { j - 1 };
                     let components = check_surroundings(
@@ -64,7 +51,7 @@ pub fn process_input(input: Vec<String>) -> Vec<Part> {
                     for component in components {
                         parts.push(Part {
                             number: num,
-                            component,
+                            component: get_component(component),
                         })
                     }
                     num = 0;
@@ -84,7 +71,7 @@ pub fn process_input(input: Vec<String>) -> Vec<Part> {
             for component in components {
                 parts.push(Part {
                     number: num,
-                    component,
+                    component: get_component(component),
                 })
             }
         }
@@ -117,6 +104,13 @@ fn check_surroundings(
         .filter_map(|c| c.map(|c| c.clone()))
         .filter(|c| is_symbol(c))
         .collect()
+}
+
+fn get_component(input: char) -> Component {
+    match input {
+        '*' => Gear,
+        _ => Component::Component(input),
+    }
 }
 
 fn is_symbol(input: &char) -> bool {
@@ -177,7 +171,7 @@ mod engine_tests {
         let actual = process_input(vec![String::from(input)]);
         let expected = vec![Part {
             number: 123,
-            component: '*',
+            component: Gear,
         }];
 
         assert_eq!(expected, actual)
@@ -189,7 +183,7 @@ mod engine_tests {
         let actual = process_input(vec![String::from(input)]);
         let expected = vec![Part {
             number: 123,
-            component: '*',
+            component: Gear,
         }];
 
         assert_eq!(expected, actual)
@@ -203,11 +197,11 @@ mod engine_tests {
         let expected = vec![
             Part {
                 number: 123,
-                component: '*',
+                component: Gear,
             },
             Part {
                 number: 234,
-                component: '#',
+                component: Component::Component('#'),
             },
         ];
 
@@ -236,7 +230,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: '*',
+            component: Gear,
         }];
 
         assert_eq!(expected, actual)
@@ -254,7 +248,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: '#',
+            component: Component::Component('#'),
         }];
 
         assert_eq!(expected, actual)
@@ -272,7 +266,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: '#',
+            component: Component::Component('#'),
         }];
 
         assert_eq!(expected, actual)
@@ -290,7 +284,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: '#',
+            component: Component::Component('#'),
         }];
 
         assert_eq!(expected, actual)
@@ -310,23 +304,23 @@ mod engine_tests {
         let expected = vec![
             Part {
                 number: 334,
-                component: '#',
+                component: Component::Component('#'),
             },
             Part {
                 number: 123,
-                component: '*',
+                component: Gear,
             },
             Part {
                 number: 123,
-                component: '#',
+                component: Component::Component('#'),
             },
             Part {
                 number: 456,
-                component: '#',
+                component: Component::Component('#'),
             },
             Part {
                 number: 456,
-                component: '*',
+                component: Gear,
             },
         ];
 
@@ -360,7 +354,7 @@ mod engine_tests {
 
         let expected = vec![Part {
             number: 123,
-            component: '*',
+            component: Gear,
         }];
 
         assert_eq!(expected, actual)
@@ -379,15 +373,15 @@ mod engine_tests {
         let expected = vec![
             Part {
                 number: 24,
-                component: '$',
+                component: Component::Component('$'),
             },
             Part {
                 number: 4,
-                component: '-',
+                component: Component::Component('-'),
             },
             Part {
                 number: 4,
-                component: '*',
+                component: Gear,
             },
         ];
 
