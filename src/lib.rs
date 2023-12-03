@@ -193,7 +193,7 @@ mod tests {
             .map(|s| s.to_string())
             .collect();
 
-        let expected_result = 0;
+        let expected_result = 539590;
         let result = solve_day_3_part_1(lines);
         assert_eq!(expected_result, result)
     }

@@ -152,9 +152,9 @@ mod game_tests {
     }
 
     get_game_and_input_has_correct_id! {
-        test_1: (1),
-        test_2: (9),
-        test_3: (50),
+        test_1: 1,
+        test_2: 9,
+        test_3: 50,
     }
 
     #[test]
