@@ -40,7 +40,8 @@ pub fn win_pow(wins: Vec<u32>) -> u32 {
 impl Card {
     pub fn from_string(input: &str) -> Self {
         let (id_str, numbers) = split_rest(input, ':');
-        let id_str = id_str.replace("Card ", "");
+        let id_str = id_str.replace("Card", "");
+        let id_str = id_str.trim();
 
         let id: u32 = id_str.parse().expect("Should have id");
 
