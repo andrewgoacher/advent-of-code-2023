@@ -1,5 +1,7 @@
+use crate::card::{win_pow, Card};
 use crate::game::CubesPulled;
 
+mod card;
 mod engine;
 mod game;
 mod string_utils;
@@ -56,7 +58,12 @@ pub fn solve_day_3_part_2(lines: Vec<String>) -> u32 {
 }
 
 pub fn solve_day_4_part_1(lines: Vec<String>) -> u32 {
-    0
+    lines
+        .iter()
+        .map(|c| Card::from_string(c))
+        .map(|c| c.get_wins())
+        .map(|w| win_pow(w))
+        .sum()
 }
 
 #[cfg(test)]
