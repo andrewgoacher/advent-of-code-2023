@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::card::{win_pow, Card};
 use crate::game::CubesPulled;
 
@@ -67,7 +69,14 @@ pub fn solve_day_4_part_1(lines: Vec<String>) -> u32 {
 }
 
 pub fn solve_day_4_part_2(lines: Vec<String>) -> u32 {
-    0
+    let map: HashMap<u32, Card> = lines
+        .iter()
+        .map(|c| Card::from_string(c))
+        .map(|c| (c.id, c))
+        .collect();
+
+    let wins = Card::generate_from_wins(map);
+    wins.len().try_into().expect("Should have value")
 }
 
 #[cfg(test)]

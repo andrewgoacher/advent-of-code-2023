@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Debug, PartialEq)]
 pub struct Card {
     pub id: u32,
@@ -37,6 +39,27 @@ pub fn win_pow(wins: Vec<u32>) -> u32 {
     }
 }
 
+fn push_many<T>(collection: &mut Vec<T>, add: &Vec<T>) -> ()
+where
+    T: Clone,
+{
+    for a in add {
+        collection.push(a.clone());
+    }
+}
+
+fn push_wins_into_vec(cards: &HashMap<u32, Card>, wins: &mut Vec<u32>, card: &Card) -> () {
+    let current_wins = card.get_win_ids();
+    push_many(wins, &current_wins);
+
+    for current_win in current_wins {
+        let card = cards.get(&current_win);
+        if let Some(c) = card {
+            push_wins_into_vec(cards, wins, c);
+        }
+    }
+}
+
 impl Card {
     pub fn from_string(input: &str) -> Self {
         let (id_str, numbers) = split_rest(input, ':');
@@ -59,15 +82,35 @@ impl Card {
         }
     }
 
+    pub fn generate_from_wins(cards: HashMap<u32, Card>) -> Vec<u32> {
+        let mut win_ids: Vec<u32> = vec![];
+
+        for card in cards.iter() {
+            let (id, card) = card;
+            win_ids.push(id.clone());
+            push_wins_into_vec(&cards, &mut win_ids, card);
+        }
+
+        win_ids
+    }
+
     pub fn get_wins(&self) -> Vec<u32> {
         let mut wins = vec![];
         for winning_number in self.winning_numbers.iter() {
-            if let Ok(x) = self.available_numbers.binary_search(&winning_number) {
+            if let Ok(_) = self.available_numbers.binary_search(&winning_number) {
                 wins.push(winning_number.clone());
             }
         }
 
         wins
+    }
+
+    pub fn get_win_ids(&self) -> Vec<u32> {
+        let wins = self.get_wins();
+        let len: u32 = wins.len().try_into().expect("Should parse");
+        let id = self.id;
+
+        (1..len + 1).map(|num| id + num).collect()
     }
 }
 
